@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: employee-management
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+  thymeleaf:
+    cache: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10m
+    cache-names:
+      - employees
+      - employeeById
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.example.employeemanagement: DEBUG
+
+app:
+  admin:
+    username: admin
+    password: admin123
+    email: admin@company.com
