@@ -35,9 +35,9 @@
 
     <div class="nav-user">
         <div class="user-chip">
-            <div class="avatar" th:attr="data-avatar-name=${#authentication.name}">U</div>
+            <div class="avatar" th:attr="data-avatar-name=${#authentication != null ? #authentication.name : 'User'}" th:text="${#authentication != null and #authentication.name != null and #authentication.name.length() > 0 ? #strings.substring(#authentication.name,0,1).toUpperCase() : 'U'}">U</div>
             <div class="user-info">
-                <span class="user-name" sec:authentication="name">User</span>
+                <span class="user-name" th:text="${#authentication != null ? #authentication.name : 'User'}">User</span>
                 <span class="user-role-badge" sec:authorize="hasRole('ADMIN')">Admin</span>
                 <span class="user-role-badge" sec:authorize="!hasRole('ADMIN')">User</span>
             </div>
@@ -139,7 +139,8 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Employee</th>
+                    <th>Name</th>
+                    <th>Email</th>
                     <th>Department</th>
                     <th>Designation</th>
                     <th>Salary</th>
@@ -151,12 +152,12 @@
                 <tr th:each="emp : ${employees}">
                     <td>
                         <div class="employee-cell">
-                            <div class="employee-avatar" th:attr="data-avatar-name=${emp.name}">E</div>
-                            <div class="employee-info">
-                                <span class="employee-name" th:text="${emp.name}"></span>
-                                <span class="employee-email" th:text="${emp.email}"></span>
-                            </div>
+                            <div class="employee-avatar" th:attr="data-avatar-name=${emp.name}" th:text="${emp.name != null and emp.name.length() > 0 ? #strings.substring(emp.name,0,1).toUpperCase() : 'E'}">E</div>
+                            <span class="employee-name" th:text="${emp.name}" style="font-weight: 600; color: #0f172a; font-size: 0.925rem;"></span>
                         </div>
+                    </td>
+                    <td>
+                        <span th:text="${emp.email}" style="color: #475569; font-weight: 500;"></span>
                     </td>
                     <td>
                         <span class="badge badge-dept">
@@ -197,7 +198,7 @@
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(employees)}">
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="empty-state">
                             <i class="bi bi-people"></i>
                             <h3 class="empty-state-title">No employees found</h3>

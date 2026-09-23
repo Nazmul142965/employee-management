@@ -11,6 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
@@ -54,19 +56,29 @@ public class AdminUserController {
     }
 
     @PostMapping("/toggle/{id}")
-    public String toggleUser(@PathVariable String id, RedirectAttributes redirectAttributes) {
+    public String toggleUser(@PathVariable String id, Principal principal, RedirectAttributes redirectAttributes) {
         appUserRepository.findById(id).ifPresent(u -> {
+            if (principal != null && principal.getName().equalsIgnoreCase(u.getUsername())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "You cannot disable your own admin account!");
+                return;
+            }
             u.setEnabled(!u.isEnabled());
             appUserRepository.save(u);
+            redirectAttributes.addFlashAttribute("successMessage", "User status updated!");
         });
-        redirectAttributes.addFlashAttribute("successMessage", "User status updated!");
         return "redirect:/admin/users";
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteUser(@PathVariable String id, RedirectAttributes redirectAttributes) {
-        appUserRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "User deleted!");
+    public String deleteUser(@PathVariable String id, Principal principal, RedirectAttributes redirectAttributes) {
+        appUserRepository.findById(id).ifPresent(u -> {
+            if (principal != null && principal.getName().equalsIgnoreCase(u.getUsername())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "You cannot delete your own admin account!");
+                return;
+            }
+            appUserRepository.delete(u);
+            redirectAttributes.addFlashAttribute("successMessage", "User deleted!");
+        });
         return "redirect:/admin/users";
     }
 }

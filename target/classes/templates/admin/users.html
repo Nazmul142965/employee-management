@@ -72,6 +72,12 @@
             <span th:text="${successMessage}"></span>
         </div>
 
+        <!-- ERROR FLASH ALERT -->
+        <div class="alert alert-error" th:if="${errorMessage}">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
         <div class="table-responsive">
             <table>
                 <thead>
@@ -111,20 +117,27 @@
                     </td>
                     <td style="text-align: right;">
                         <div class="actions" style="justify-content: flex-end;">
-                            <form th:action="@{/admin/users/toggle/{id}(id=${u.id})}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-secondary btn-sm"
-                                        th:title="${u.enabled} ? 'Disable Account' : 'Enable Account'">
-                                    <i th:class="${u.enabled} ? 'bi bi-dash-circle' : 'bi bi-check-circle'"></i>
-                                    <span th:text="${u.enabled} ? 'Disable' : 'Enable'"></span>
-                                </button>
-                            </form>
-                            <form th:action="@{/admin/users/delete/{id}(id=${u.id})}" method="post"
-                                  onsubmit="return confirm('Are you sure you want to permanently delete this user account?');" style="display:inline;">
-                                <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete User">
-                                    <i class="bi bi-trash3"></i>
-                                    <span>Delete</span>
-                                </button>
-                            </form>
+                            <th:block th:if="${#authentication != null and u.username == #authentication.name}">
+                                <span class="badge badge-dept" title="You cannot disable or delete your own account">
+                                    <i class="bi bi-person-check-fill" style="color:var(--primary);"></i> Current User
+                                </span>
+                            </th:block>
+                            <th:block th:unless="${#authentication != null and u.username == #authentication.name}">
+                                <form th:action="@{/admin/users/toggle/{id}(id=${u.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-secondary btn-sm"
+                                            th:title="${u.enabled} ? 'Disable Account' : 'Enable Account'">
+                                        <i th:class="${u.enabled} ? 'bi bi-dash-circle' : 'bi bi-check-circle'"></i>
+                                        <span th:text="${u.enabled} ? 'Disable' : 'Enable'"></span>
+                                    </button>
+                                </form>
+                                <form th:action="@{/admin/users/delete/{id}(id=${u.id})}" method="post"
+                                      onsubmit="return confirm('Are you sure you want to permanently delete this user account?');" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger-outline btn-sm" title="Delete User">
+                                        <i class="bi bi-trash3"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
+                            </th:block>
                         </div>
                     </td>
                 </tr>
